@@ -1,0 +1,11 @@
+<div class="container">
+  <h2>Forgot Password</h2>
+  <form (ngSubmit)="sendOtp()">
+    <div>
+      <label>Email:</label>
+      <input type="email" [(ngModel)]="email" name="email" required>
+    </div>
+    <button type="submit">Send OTP</button>
+  </form>
+  <p *ngIf="message">{{ message }}</p>
+</div>

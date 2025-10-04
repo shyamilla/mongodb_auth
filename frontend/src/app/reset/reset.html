@@ -1,0 +1,19 @@
+<div class="container">
+    <h2>Reset Password</h2>
+    <form (ngSubmit)="resetPassword()">
+        <div>
+            <label>Email:</label>
+            <input type="email" [(ngModel)]="email" name="email" required>
+        </div>
+        <div>
+            <label>OTP:</label>
+            <input type="text" [(ngModel)]="otp" name="otp" required>
+        </div>
+        <div>
+            <label>New Password:</label>
+            <input type="password" [(ngModel)]="newPassword" name="newPassword" required>
+        </div>
+        <button type="submit">Reset Password</button>
+    </form>
+    <p *ngIf="message">{{ message }}</p>
+</div>
