@@ -17,13 +17,17 @@ export class LoginComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  login() {
-    this.authService.login(this.loginData).subscribe({
-      next: (res: any) => {
-        localStorage.setItem('token', res.token);
-        this.router.navigate(['/welcome']);
-      },
-      error: (err: any) => this.message = err.error || 'Login failed'
-    });
-  }
+ login() {
+  // Clear old token first
+  localStorage.removeItem('token');
+
+  this.authService.login(this.loginData).subscribe({
+    next: (res: any) => {
+      localStorage.setItem('token', res.token); // store fresh token
+      this.router.navigate(['/welcome']);
+    },
+    error: (err: any) => this.message = err.error || 'Login failed'
+  });
+}
+
 }

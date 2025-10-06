@@ -20,9 +20,10 @@ export class AuthService {
     return this.http.post(`${this.apiUrl}/login`, credentials);
   }
 
-  getWelcome(): Observable<any> {
+
+   getWelcome(): Observable<any> {
     const token = localStorage.getItem('token');
-    const headers = token ? new HttpHeaders({ 'Authorization': `Bearer ${token}` }) :  undefined //new HttpHeaders();
+    const headers = token ? new HttpHeaders({ Authorization: `Bearer ${token}` }) : undefined;
     return this.http.get(`${this.apiUrl}/welcome`, { headers });
   }
 

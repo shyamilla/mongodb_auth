@@ -17,13 +17,28 @@ export class ForgotComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
+  // sendOtp() {
+  //   this.authService.forgotPassword(this.email).subscribe({
+  //     next: () => {
+  //       this.message = 'OTP sent successfully!';
+  //       this.router.navigate(['/reset'], { state: { email: this.email } });
+  //     },
+  //     error: (err: any) => this.message = err.error || 'Failed to send OTP'
+  //   });
+  // }
+
+
   sendOtp() {
-    this.authService.forgotPassword(this.email).subscribe({
-      next: () => {
-        this.message = 'OTP sent successfully!';
-        this.router.navigate(['/reset'], { state: { email: this.email } });
-      },
-      error: (err: any) => this.message = err.error || 'Failed to send OTP'
-    });
-  }
+  this.authService.forgotPassword({ email: this.email }).subscribe({
+    next: () => {
+      this.message = '✅ OTP sent successfully!';
+      this.router.navigate(['/reset'], { state: { email: this.email } });
+    },
+    error: (err: any) => {
+      console.error('Forgot password error:', err);
+      this.message = err.error?.message || '❌ Failed to send OTP';
+    }
+  });
+}
+
 }

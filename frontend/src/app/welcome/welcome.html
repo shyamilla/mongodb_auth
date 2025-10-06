@@ -1,5 +1,6 @@
 <div class="container">
   <h2>Welcome Page</h2>
   <p *ngIf="username">Hello, {{ username }}!</p>
+  <p *ngIf="!username">{{ message }}</p>
   <button (click)="logout()">Logout</button>
 </div>

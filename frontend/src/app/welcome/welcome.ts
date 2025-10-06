@@ -1,46 +1,39 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../services/auth.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-welcome',
   standalone: true,
-  imports: [CommonModule, RouterModule],
-  templateUrl: './welcome.html',
-  styleUrls: ['./welcome.css']
+  imports: [CommonModule],
+  templateUrl: './welcome.html'
 })
 export class WelcomeComponent implements OnInit {
-  username = '';
+  username: string | null = null;
+  message = '';
 
-  constructor(private authService: AuthService, private router: Router) { }
+  constructor(
+    private authService: AuthService,
+    private router: Router
+  ) { }
 
   ngOnInit() {
-    // const token = localStorage.getItem('token');
-    // if (!token) {
-    //   this.router.navigate(['/login'])
-    // }
-    // else {
-    //   this.router.navigate(['/welcome'])
-    //   return;
-    // }
-
-   
-
-  this.authService.getWelcome().subscribe({
-    next: (res: any) => {
-      this.username = res.username || res;
-    },
-    error: () => {
-      // Token invalid or expired
-      this.authService.logout();
-      this.router.navigate(['/login']);
-    }
-  });
-}
+    this.authService.getWelcome().subscribe({
+      next: (res: any) => {
+        this.message = res.message || 'Welcome!';
+        if (res.username) {
+          this.username = res.username;
+        }
+      },
+      error: (err: any) => {
+        this.message = 'Unauthorized or session expired';
+      }
+    });
+  }
 
   logout() {
-    this.authService.logout();
+    localStorage.removeItem('token');
     this.router.navigate(['/login']);
   }
 }
