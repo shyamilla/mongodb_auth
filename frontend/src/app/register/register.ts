@@ -17,13 +17,23 @@ export class RegisterComponent {
 
   constructor(private authService: AuthService, private router: Router) {}
 
-  register() {
-    this.authService.register(this.user).subscribe({
-      next: () => {
-        this.message = 'Registered successfully!';
-        this.router.navigate(['/login']);
-      },
-      error: (err: any) => this.message = err.error || 'Registration failed'
-    });
-  }
+register() {
+  this.authService.register(this.user).subscribe({
+    next: () => {
+      // Directly redirect after successful registration
+      this.router.navigate(['/login']);
+    },
+    error: (err: any) => {
+      console.log('Registration error:', err);
+      if (typeof err.error === 'string') {
+        this.message = err.error;
+      } else if (err.error?.message) {
+        this.message = err.error.message;
+      } else {
+        this.message = 'Registration failed';
+      }
+    }
+  });
+}
+
 }

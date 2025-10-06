@@ -38,17 +38,28 @@ public class AuthController {
     @Autowired
     private JavaMailSender mailSender;
 
-    @PostMapping("/register")
-    public String register(@RequestBody User user) {
-        if (userRepository.findByUsername(user.getUsername()).isPresent())
-            return "Username exists";
-        if (userRepository.findByEmail(user.getEmail()).isPresent())
-            return "Email exists";
-
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
-        userRepository.save(user);
-        return "Registered successfully";
+   @PostMapping("/register")
+public ResponseEntity<?> register(@RequestBody User user) {
+    if (userRepository.findByUsername(user.getUsername()).isPresent()) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) // 409 Conflict
+                .body(Map.of("message", "Username already exists"));
     }
+
+    if (userRepository.findByEmail(user.getEmail()).isPresent()) {
+        return ResponseEntity
+                .status(HttpStatus.CONFLICT) // 409 Conflict
+                .body(Map.of("message", "Email already exists"));
+    }
+
+    user.setPassword(passwordEncoder.encode(user.getPassword()));
+    userRepository.save(user);
+
+    return ResponseEntity
+            .status(HttpStatus.CREATED) // 201 Created
+            .body(Map.of("message", "Registered successfully"));
+}
+
 
     @PostMapping("/login")
     public Map<String, String> login(@RequestBody Map<String, String> body) {
@@ -125,28 +136,37 @@ public ResponseEntity<?> forgotPassword(@RequestBody Map<String, String> body) {
 
 
     @PostMapping("/reset")
-    public String resetPassword(@RequestBody Map<String, String> body) {
-        String email = body.get("email");
-        String otp = body.get("otp");
-        String newPassword = body.get("newPassword");
+public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> body) {
+    String email = body.get("email");
+    String otp = body.get("otp");
+    String newPassword = body.get("newPassword");
 
-        Optional<User> user = userRepository.findByEmail(email);
-        if (user.isEmpty())
-            return "Email not found";
-
-        if (!otp.equals(user.get().getResetOtp()))
-            return "Invalid OTP";
-
-        user.get().setPassword(passwordEncoder.encode(newPassword));
-        user.get().setResetOtp(null);
-        userRepository.save(user.get());
-
-        return "Password reset successfully";
+    Optional<User> user = userRepository.findByEmail(email);
+    if (user.isEmpty()) {
+        return ResponseEntity
+                .status(HttpStatus.NOT_FOUND) // 404
+                .body(Map.of("message", "Email not found"));
     }
 
-    @PostMapping("/logout")
-    public String logout() {
-        // Since JWT is stateless, logout can be handled client-side by deleting token
-        return "Logged out successfully";
+    if (!otp.equals(user.get().getResetOtp())) {
+        return ResponseEntity
+                .status(HttpStatus.BAD_REQUEST) // 400
+                .body(Map.of("message", "Invalid OTP"));
     }
+
+    user.get().setPassword(passwordEncoder.encode(newPassword));
+    user.get().setResetOtp(null);
+    userRepository.save(user.get());
+
+    return ResponseEntity
+            .ok(Map.of("message", "Password reset successfully"));
+}
+
+@PostMapping("/logout")
+public ResponseEntity<?> logout() {
+    // JWT is stateless: just instruct client to delete its token
+    return ResponseEntity
+            .ok(Map.of("message", "Logged out successfully"));
+}
+
 }
